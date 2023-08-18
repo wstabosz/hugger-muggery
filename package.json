@@ -1,0 +1,21 @@
+{
+  "name": "huggermuggery",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "build": "rm -rf build &&  node build.js"
+  },
+  "author": "Walter Stabosz",
+  "license": "ISC",
+  "dependencies": {
+    "@node-minify/core": "^6.2.0",
+    "@node-minify/crass": "^6.2.0",
+    "@node-minify/cssnano": "^6.2.0",
+    "@node-minify/html-minifier": "^6.2.0",
+    "@node-minify/uglify-es": "^6.2.0",
+    "@node-minify/uglify-js": "^6.2.0",
+    "minify": "^7.1.0"
+  }
+}

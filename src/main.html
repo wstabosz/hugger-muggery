@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+        
+    <title>&#x1F47A; Huggermuggery</title>
+    
+    <script lang="Javascript" src="main.js" async></script>
+
+    <link rel="stylesheet" type="text/css" href="main.css" />
+    
+    <!--%head%-->
+
+</head>
+
+<body>
+
+    <div class="flex">
+
+        <!-- Sender section -->
+        <div id="send" class="bg-blue b1-gray">
+            <h2>Send Files</h2>
+
+            <div id="dropZone" class="ready">
+                <div class="ready">
+                    <i>Drop files here ...</i>                        
+                    <a id="browseLink" href="#">or click here to browse for files</a>
+                    <input id="fileInput" type="file" class="hidden" multiple>
+                </div>
+
+                <div class="waiting">
+                    <i>Please wait ...</i>
+                </div>
+            </div>
+
+            <div id="fileSendQueue" class="box">
+                <h2>File Send Queue</h2>
+                <div>The queue is currently empty.</div>            
+                <button type="button" id="copyToClipboardButton">&#x1f4cb; Copy all to Clipboard</button>
+                <!-- <span class="popover" id="copyPop">File blob copied !</span> -->
+
+                <div id="clipboardBufferOverflowError">
+                    <b>A problem has occurred:</b><br/>
+                    Your file blob is larger than you clipboard buffer size setting.<br/>
+                    You may experience a problem when you paste your blob into the Receiver.<br/>
+                </div>
+            </div>
+            
+            <div class="box">
+                <h2>Settings</h2>
+                <p>
+                    <label for="clipboardBufferSize">Clipboard Buffer Size:</label>
+                    <input type="text" id="clipboardBufferSize" placeholder="Unlimited"/>
+                    <span class="validationError">Value must be a number.</span>
+                </p>
+                <p>
+                    <label class="pointer">
+                        <input type="checkbox" id="showPasteable" />Show JavaScript Pasteables
+                    </label> - a Pasteable is a block of JS code that can be pasted and executed in the browser's JS console to transfer a file without using the Receiver
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Receiver section -->
+        <div id="receive" class="bg-yellow b1-gray">
+            <h2>Receive Files</h2>
+
+            <textarea id="pasteToBox" placeholder="Paste your file blob here." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+            <div id="fileReceiveQueue" class="box">
+                <h2>Received Files</h2>
+                <div id="fileReceiveList">No files have been received.</div>
+                <button type="button" id="saveAllFiles" disabled="true">&#x1f4be; Save all Files</button>
+                &nbsp;<button type="button" id="clearFiles" disabled="true">Clear</button>
+                
+                <div id="fileReceiveError">
+                    <b>A problem has occurred:</b><br/>
+                    One or more of your files failed to transfer.<br/>
+                    This probably occurred because your text clipboard buffer is too small to hold all the files at once.<br/>
+                    Your clipboard buffer size is <b><span id="bufferSizeSpan"></span></b> characters.<br/>
+                    <br/>
+                    <b>To resolve:</b> Try Sending one file at a time using the [Copy Single File] button.<br/>
+                </div>
+            </div>
+            
+            <div id="errorMessage">
+                <h2>Error</h2>
+                <div></div>
+            </div>
+
+        </div>
+
+    </div>    
+
+    <textarea id="copyFromBox" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+    
+</body>
+
+</html>
