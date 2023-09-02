@@ -5,12 +5,9 @@
     <meta content="utf-8" http-equiv="encoding">
         
     <title>&#x1F47A; Huggermuggery</title>
-    
-    <script lang="Javascript" src="main.js" async></script>
-
-    <link rel="stylesheet" type="text/css" href="main.css" />
-    
-    <!--%head%-->
+        
+    <script lang=Javascript src=main.js async></script>    
+    <link rel=stylesheet href=main.css>
 
 </head>
 
@@ -19,8 +16,8 @@
     <div class="flex">
 
         <!-- Sender section -->
-        <div id="send" class="bg-blue b1-gray">
-            <h2>Send Files</h2>
+        <div id="send" class="b1-gray">
+            <h2>&#49;&#65039;&#8419; Send Files</h2>
 
             <div id="dropZone" class="ready">
                 <div class="ready">
@@ -33,12 +30,11 @@
                     <i>Please wait ...</i>
                 </div>
             </div>
-
+            
             <div id="fileSendQueue" class="box">
-                <h2>File Send Queue</h2>
+                <h2>&#50;&#65039;&#8419; File Send Queue</h2>
                 <div>The queue is currently empty.</div>            
-                <button type="button" id="copyToClipboardButton">&#x1f4cb; Copy all to Clipboard</button>
-                <!-- <span class="popover" id="copyPop">File blob copied !</span> -->
+                <button type="button" id="copyAllButton">&#x1f4cb; Copy all to Clipboard</button>
 
                 <div id="clipboardBufferOverflowError">
                     <b>A problem has occurred:</b><br/>
@@ -50,35 +46,35 @@
             <div class="box">
                 <h2>Settings</h2>
                 <p>
+                    <label class="pointer">
+                        <input type="checkbox" id="showPasteable" />Show JavaScript Pasteables
+                    </label> - JS code that can be pasted and executed in the browser's JS console to transfer a file without using the Receiver
+                </p>
+                <p>
                     <label for="clipboardBufferSize">Clipboard Buffer Size:</label>
                     <input type="text" id="clipboardBufferSize" placeholder="Unlimited"/>
                     <span class="validationError">Value must be a number.</span>
-                </p>
-                <p>
-                    <label class="pointer">
-                        <input type="checkbox" id="showPasteable" />Show JavaScript Pasteables
-                    </label> - a Pasteable is a block of JS code that can be pasted and executed in the browser's JS console to transfer a file without using the Receiver
                 </p>
             </div>
 
         </div>
 
         <!-- Receiver section -->
-        <div id="receive" class="bg-yellow b1-gray">
-            <h2>Receive Files</h2>
+        <div id="receive" class="b1-gray">
+            <h2>&#51;&#65039;&#8419; Receive Files</h2>
 
             <textarea id="pasteToBox" placeholder="Paste your file blob here." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
             <div id="fileReceiveQueue" class="box">
-                <h2>Received Files</h2>
+                <h2>&#52;&#65039;&#8419; Received Files</h2>
                 <div id="fileReceiveList">No files have been received.</div>
-                <button type="button" id="saveAllFiles" disabled="true">&#x1f4be; Save all Files</button>
-                &nbsp;<button type="button" id="clearFiles" disabled="true">Clear</button>
+                <button type="button" id="saveAllFiles" disabled>&#x1f4be; Save all Files</button>
+                &nbsp;<button type="button" id="clearFiles" disabled>Clear</button>
                 
                 <div id="fileReceiveError">
                     <b>A problem has occurred:</b><br/>
                     One or more of your files failed to transfer.<br/>
                     This probably occurred because your text clipboard buffer is too small to hold all the files at once.<br/>
-                    Your clipboard buffer size is <b><span id="bufferSizeSpan"></span></b> characters.<br/>
+                    Your clipboard buffer size is estimated to be <b><span id="bufferSizeSpan"></span></b> characters.<br/>
                     <br/>
                     <b>To resolve:</b> Try Sending one file at a time using the [Copy Single File] button.<br/>
                 </div>
@@ -93,8 +89,22 @@
 
     </div>    
 
-    <textarea id="copyFromBox" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-    
+    <!--cut-->
+    <div class="bg-green b1-gray mt1 footer">
+        <ul>
+            <li>
+                <a href="about.html">about</a>
+            </li>
+            <li>
+                <a href="https://drboring.com">made by Walter Stabosz</a>
+            </li>
+            <li>
+                <a href="https://github.com/wstabosz/hugger-muggery">source code</a>
+            </li>
+        </ul>
+        
+    </div>
+    <!--cut-->
 </body>
 
 </html>

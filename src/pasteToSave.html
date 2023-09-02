@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+
+    <title>&#x1f4be; Paste to Save Creator</title>
+
+    <style>
+        textarea {
+            width: 100%;
+            display: block;
+            box-sizing: border-box;
+            min-height: 10rem;  
+            height: 80%;          
+        }
+        div {
+            border: 1px solid gray;
+            padding: 0 0.5rem;
+            margin: 1rem;
+            background-color: rgb(255, 254, 211);
+            display: flex;
+            flex-direction: column;            
+            height: 50%;
+        }
+
+        body {
+            margin: 0;
+            background-color: #ccc;
+        }
+        button {
+            font-size: 1rem;
+            margin: 0.5rem 0rem;
+            box-shadow: none;
+            transition: box-shadow .2s linear;
+            padding: 0.25rem;
+            cursor: pointer;
+        }
+        .glow {    
+            box-shadow: 0 0 5px 7px red;
+            transition: box-shadow .2s linear;
+        }
+        h3 {
+            margin: 0.5rem 0rem;
+        }
+    </style>
+
+
+    <script>
+
+        let ui = {};
+
+        function createScript(plaintext) {
+
+            if(!plaintext)
+                return '';
+
+        let name = 'file.html';
+        const base64 = btoa(plaintext);
+
+        return `
+(()=>{Array.prototype.forEach.call(document.styleSheets,o=>o.disabled = true);
+let a=document.createElement('a');
+a.href='data:text/html;base64,${base64}';
+a.download='${name}';
+a.innerText='Download';
+document.body.innerHTML='';
+document.body.appendChild(a);})();`
+        .split('\n').join('');
+
+        }
+
+        
+        function main() {
+
+            const ui = Array.from(document.querySelectorAll('[id]'))
+                .reduce((acc,cur) => ({ ...acc, [cur.id]: cur}), {});
+
+            ui.input.addEventListener('input', () => {
+                ui.output.value = createScript(input.value);
+            });
+
+            ui.copy.addEventListener('click', () => {
+                navigator.clipboard.writeText(ui.output.value);
+                glow(ui.copy);
+            });
+
+            ui.clear.addEventListener('click', () => {
+                ui.input.value = '';
+                ui.output.value = '';
+            });
+
+            ui.output.value = createScript(input.value);
+
+        }
+
+        function glow(elm) {
+            elm.classList.add('glow');        
+            setTimeout(() => {        
+                elm.classList.remove('glow');
+            }, 300);
+        }
+
+        document.addEventListener('readystatechange', () => {
+            if (document.readyState === 'complete') {
+                main();
+            }
+        });
+
+    </script>
+</head>
+
+<body>
+
+    <div>
+        <h3>1&#65039;&#8419; Enter some text here:</h3>
+        <textarea id="input" spellcheck="false"></textarea>
+        <button id="clear">Clear</button>
+    </div>
+
+    <div>
+        <h3>2&#65039;&#8419; Execute this script in your browser's JavaScript console to download a file containing the text entered above.</h3>
+        <textarea id="output" spellcheck="false"></textarea>
+        <button id="copy">&#x1f4cb; Copy to Clipboard</button>
+    </div>
+
+</body>
+
+</html>
