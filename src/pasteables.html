@@ -53,26 +53,6 @@
 
         let ui = {};
 
-        function createScript(plaintext) {
-
-            if(!plaintext)
-                return '';
-
-        let name = 'file.html';
-        const base64 = btoa(plaintext);
-
-        return `
-(()=>{Array.prototype.forEach.call(document.styleSheets,o=>o.disabled = true);
-let a=document.createElement('a');
-a.href='data:text/html;base64,${base64}';
-a.download='${name}';
-a.innerText='Download';
-document.body.innerHTML='';
-document.body.appendChild(a);})();`
-        .split('\n').join('');
-
-        }
-
         
         function main() {
 
@@ -130,15 +110,13 @@ document.body.appendChild(a);})();`
     </div>
 
     <div>
-        <h3>1&#65039;&#8419; Enter some text here:</h3>
-        <textarea id="input" spellcheck="false"></textarea>
-        <button id="clear">Clear</button>
+        <h3>Paste to Launch Huggermuggery</h3>
+        <button id="copyLaunch">&#x1f4cb; Copy to Clipboard</button>
     </div>
 
     <div>
-        <h3>2&#65039;&#8419; Execute this script in your browser's JavaScript console to download a file containing the text entered above.</h3>
-        <textarea id="output" spellcheck="false"></textarea>
-        <button id="copy">&#x1f4cb; Copy to Clipboard</button>
+        <h3>Paste to Download Huggermuggery</h3>
+        <button id="copyDownload">&#x1f4cb; Copy to Clipboard</button>
     </div>
 
 </body>

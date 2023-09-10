@@ -26,7 +26,7 @@ const cut = function(string='', markers = ['<!--A-->','<!--B-->']) {
     let start;
     
     while (-1 !== (start=string.indexOf(markers[0]))) {
-        let end = string.indexOf(markers[1],start);
+        let end = string.indexOf(markers[1],start+1);
         string = [
             string.substring(0,start), 
             string.substring(end+markers[1].length)
@@ -118,24 +118,23 @@ const toBase64 = function(text) {
  * figure it out.
  * @param {string} text 
  */
-const createConsoleLauncher = function(base64) {
+const createConsoleLauncher = function(miniPieces,pieces) {
+
+    let base64 = toBase64(miniPieces.packedHtmlCssNoJs);
+    let script = miniPieces.js;
 
 return `
 var appHtml = atob('${base64}');
-var win = window.open('','_blank', 'noopener,noreferrer');
-win.document.body.innerHTML = appHtml;
+document.documentElement.innerHTML = appHtml;
+{${script}}
+window['init']();
 `.split('\n').join('');
 
 }
 
-const createSaferConsoleDownloader = function(miniPackedHtml) {
+const createConsoleDownloader = function(packed) {
 
-    let escaped = miniPackedHtml.replaceAll('"','\\"');
-    
-
-}
-
-const createConsoleDownloader = function(base64) {
+    let base64 = toBase64(packed);
 
     let name = 'app.html';
 
@@ -172,13 +171,16 @@ const packNoMinify = function(pieces) {
 
 const minifyAndPack = async function (paths) {
 
-    let miniPieces = await minify_html_css_js(paths);
+    let miniPieces = await minify_html_css_js(paths);    
+        
+    packedHtmlCss = injectCss(miniPieces.html,miniPieces.css);    
+    packedHtmlCssJs = injectJs(packedHtmlCss,miniPieces.js);
+    packedHtmlCssNoJs = injectJs(packedHtmlCss,'');
     
-    let miniPackedHtml = miniPieces.html;
-    miniPackedHtml = injectCss(miniPackedHtml,miniPieces.css);    
-    miniPackedHtml = injectJs(miniPackedHtml,miniPieces.js);
+    miniPieces.packedHtmlCssJs = packedHtmlCssJs;
+    miniPieces.packedHtmlCssNoJs = packedHtmlCssNoJs;
 
-    return miniPackedHtml;
+    return miniPieces;
 
 }
 
@@ -225,7 +227,8 @@ const main = async function() {
     fs.writeFileSync(paths.temp.css, pieces.css, { encoding: 'utf8' }); 
     
     //let miniPackedHtml = await ttt(paths.out.packed);
-    let miniPackedHtml = await minifyAndPack({
+    
+    let miniPieces = await minifyAndPack({
         in: {        
             html: paths.temp.html,
             css: paths.temp.css,
@@ -233,20 +236,23 @@ const main = async function() {
         }
     });
 
-    fs.writeFileSync(paths.out.packedMin, miniPackedHtml, { encoding: 'utf8' });     
-
+    fs.writeFileSync(paths.out.packedMin, miniPieces.packedHtmlCssJs, { encoding: 'utf8' });     
     
-    let saferDownloader = createSaferConsoleDownloader(miniPackedHtml);
-    fs.writeFileSync(paths.out.saferDownloader, saferDownloader,{ encoding: 'utf8' }); 
+    //let saferDownloader = createSaferConsoleDownloader(miniPackedHtml);
+    //fs.writeFileSync(paths.out.saferDownloader, saferDownloader,{ encoding: 'utf8' }); 
 
-    let base64 = toBase64(miniPackedHtml);
-    let downloader = createConsoleDownloader(base64);
+    //let base64 = toBase64(miniPieces.packed);
+    let downloader = createConsoleDownloader(miniPieces.packedHtmlCssJs);
     fs.writeFileSync(paths.out.consoleDownloader, downloader,{ encoding: 'utf8' }); 
 
+
+    let launcher = createConsoleLauncher(miniPieces, pieces);
+    fs.writeFileSync(paths.out.consoleLauncher, launcher,{ encoding: 'utf8' }); 
+
+    
+    // delete temp files
     fs.unlinkSync(paths.temp.html);
     fs.unlinkSync(paths.temp.css);
-
-    //let launcher = createConsoleLauncher(base64);
 
     // writeOutputFiles(paths, {
     //     packedHtml,

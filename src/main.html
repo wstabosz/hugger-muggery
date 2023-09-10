@@ -13,6 +13,7 @@
 
 <body>
 
+    <div class="loadingBar">If you can see this message, then something probably went wrong.</div>
     <div class="flex">
 
         <!-- Sender section -->
@@ -63,7 +64,7 @@
         <div id="receive" class="b1-gray">
             <h2>&#51;&#65039;&#8419; Receive Files</h2>
 
-            <textarea id="pasteToBox" placeholder="Paste your file blob here." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+            <textarea id="pasteToBox" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
             <div id="fileReceiveQueue" class="box">
                 <h2>&#52;&#65039;&#8419; Received Files</h2>
                 <div id="fileReceiveList">No files have been received.</div>
@@ -90,10 +91,10 @@
     </div>    
 
     <!--cut-->
-    <div class="bg-green b1-gray mt1 footer">
+    <div id="footer" class="bg-green b1-gray mt1 footer">
         <ul>
             <li>
-                <a href="about.html">about</a>
+                <a href="readme.html">readme</a>
             </li>
             <li>
                 <a href="https://drboring.com">made by Walter Stabosz</a>

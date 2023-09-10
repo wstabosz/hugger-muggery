@@ -15,6 +15,13 @@
 
 */
 
+// document.onreadystatechange = () => {
+//     console.log(`readyState: ${document.readyState}`);
+//     if (document.readyState === 'complete') {
+//         init();
+//     }
+// };
+
 let ui = {}; // cache of DOM elements
 let settings = {
     sender: {
@@ -44,25 +51,30 @@ const appData = {
  * @param {*} listener 
  * @returns 
  */
-const addEventListener2 = function(element,eventType,listener) {
+function addEventListener2(element,eventType,listener) {
     if(!element) return;
     element.addEventListener(eventType,listener);            
 };
-const addEventListener3 = function(element,listeners) {
+function addEventListener3(element,listeners) {
     for(const [k,v] of Object.entries(listeners)) {
         element.addEventListener(k,v);
     }
 }        
 
-const initDynamicEvents = () => {
+/*
+    these are events that bubble up to the document from various
+    controls that are added/removed on the page dynamically
+*/
+function initBubblingEvents() {
 
     document.addEventListener('click', (ev) => {
-
+        
         let events = {
             '.copySingle': (ev) => { 
                 let t = ev.target;
                 let id = t.value;
-                let file = fileUtil.packSingleFile(appData.s.unpackedFiles,id);
+                //let file = fileUtil.packSingleFile(appData.s.unpackedFiles,id);
+                let file = packSingleFile(appData.s.unpackedFiles,id);
                 copyToClipboard(JSON.stringify(file));
                 glow(t);
             },
@@ -80,9 +92,14 @@ const initDynamicEvents = () => {
                 glow(t);
             }
         };
-
-        let keys = Object.keys(events);
-        let filteredEvents = keys.filter(o=>ev.target.matches(o));
+        
+        // Build a list of event handlers to call based on the class
+        // Element.matches() returns true if an element would be selected
+        // by the specified CSS selector. In this case, the dynamic elements
+        // are identified by their class property. In hindsight, this does
+        // make the code a bit fragile.
+        let filteredEvents = Object.keys(events)
+            .filter(key=>ev.target.matches(key));
 
         filteredEvents.forEach(o=>events[o](ev));
 
@@ -90,82 +107,84 @@ const initDynamicEvents = () => {
 
 };
 
-const pd = (e) => {e.preventDefault()}
+function pd(e) {e.preventDefault()}
 
-const init = function() {
+window['init'] = function init() {
 
     // Build a cache of all the DOM elements with ids
     document.querySelectorAll('[id]')
         .forEach(o=>ui[o.id]=o);
 
-    initDynamicEvents();
+    initBubblingEvents();
     const ael = addEventListener2;
     const aels = addEventListener3;
-    let el = null;    
-
-    const validateInput = {
-        clipboardBufferSize: (value) => {
-
-            let number = Number(value);
-            let badInput = Number.isNaN(number);
-            
-            if(badInput)
-                settings.sender.clipboardBufferSize = 0;
-            else                
-                settings.sender.clipboardBufferSize = number;
-
-            if(ui.clipboardBufferSize) {
-                ui.clipboardBufferSize.nextElementSibling
-                    .classList.toggle('invalid',badInput);
-
-                testForSenderClipboardBufferOverflow();
-            }
-
-            
-        }
-    };
 
     appData.s.packedJson = '';    
     ael(ui.showPasteable, 'click', () => {drawSendFileTable(appData.s.unpackedFiles)});
 
-    el = ui.pasteToBox;
-    ael(el,'paste', handlePaste);
-    ael(el, 'focus', (ev) => {
-        ev.target.setAttribute('x-placeholder', ev.target.getAttribute('placeholder'));
-        ev.target.setAttribute('placeholder', 'Press Ctrl+V to paste.');                
+    //=================================================================
+
+    function placeholderToggler(el,inactive, active) {
+        
+        function sph(v) {
+            el.setAttribute('placeholder',v);
+        }
+
+        sph(inactive);
+        aels(el, {
+            focus: () => { sph(active) },
+            blur: () => { sph(inactive) }
+        });
+
+    }
+
+    ui.pasteToBox.value = '';
+    aels(ui.pasteToBox, {
+        paste: handlePaste,
+        // focus: (ev) => {
+        //     'Paste your file blob here.';
+        //     sa(ev,'x-placeholder', ga(ev,'placeholder'));
+        //     sa(ev,'placeholder', 'Press Ctrl+V to paste.');
+        //     //ev.target.setAttribute('x-placeholder', ev.target.getAttribute('placeholder'));
+        //     //ev.target.setAttribute('placeholder', 'Press Ctrl+V to paste.');
+        // },
+        // blur: (ev) => {
+        //     sa(ev,'placeholder', ga(ev,'x-placeholder'));
+        //     //ev.target.setAttribute('placeholder', ev.target.getAttribute('x-placeholder'));
+        // }
     });
-    ael(el, 'blur', (ev) => {                
-        ev.target.setAttribute('placeholder', ev.target.getAttribute('x-placeholder'));
-    });
-    el.value = '';
+
+    placeholderToggler(ui.pasteToBox,'Paste your file blob here.','Press Ctrl+V to paste.');
 
     //=================================================================
-    el = ui.saveAllFiles;
-    ael(el,'click', (ev) => { 
-        clickAllFileLinks(); 
-        glow(ev.target);
-    });
-    el.disabled = true;
+    ((el) => {        
+        ael(el,'click', (ev) => { 
+            clickAllFileLinks(); 
+            glow(ev.target);
+        });
+        el.disabled = true;
+    })(ui.saveAllFiles);
+    
+    //=================================================================
+    ((el) => {
+        ael(el,'click', () => {
+            ui.fileReceiveList.innerHTML = 'No files have been received.';
+            ui.pasteToBox.value = '';
+            ui.saveAllFiles.disabled = true;
+            el.disabled = true;
+            //ui.clearFiles.disabled = true;
+        });
+        el.disabled = true;
+    })(ui.clearFiles);
 
     //=================================================================
-    el = ui.clearFiles;
-    ael(el,'click', (ev) => {
-        ui.fileReceiveList.innerHTML = 'No files have been received.';
-        ui.pasteToBox.value = '';
-        ui.saveAllFiles.disabled = true;
-        ui.clearFiles.disabled = true;
-    });
-    el.disabled = true;
-
-    //=================================================================
-    el = ui.dropZone
     aels(document.body,
         {dragover:pd,
         drop:pd});    
 
     const t = (e,b) => (e) => e.target.classList.toggle('drag-enter',b);
 
-    aels(el,
+    aels(ui.dropZone,
         {drop:handleFileDrop,
         dragover:pd,
         dragenter:t(true),
@@ -173,12 +192,13 @@ const init = function() {
     });
 
     //=================================================================
-    el = ui.copyAllButton;
-    el.disabled = true;
-    ael(el, 'click', (ev) => {
-        copyToClipboard(appData.s.packedJson);
-        glow(ev.target);
-    });
+    ((el) => {
+        el.disabled = true;
+        ael(el, 'click', (ev) => {
+            copyToClipboard(appData.s.packedJson);
+            glow(ev.target);
+        });
+    })(ui.copyAllButton);
     
     //=================================================================
     // when user picks files with the file input element
@@ -187,31 +207,33 @@ const init = function() {
     //=================================================================
     ael(ui.browseLink, 'click', (ev) => {
         pd(ev);
-        fileInput.click();
+        ui.fileInput.click();
     });
 
     //=================================================================    
-    el = ui.clipboardBufferSize;
-    ael(el,'input', (ev) => {
-        validateInput.clipboardBufferSize(ev.target.value);                
-    });
-    validateInput.clipboardBufferSize(el.value);    
-    
+    (el => {
+        ael(el,'input', (ev) => {
+            updateClipboardBufferSize(ev.target.value);                
+        });
+        updateClipboardBufferSize(el.value);    
+    })(ui.clipboardBufferSize);
+    receive
+    document.querySelector('.loadingBar').style.setProperty('display','none');
 };
 
-const glow = function(elm) {
+function glow(elm) {
     elm.classList.add('glow');        
     setTimeout(() => {        
         elm.classList.remove('glow');
     }, 300);
 };
 
-const fileUtil = (() => {
+// const fileUtil = (() => {
 
     async function fileListToBase64(fileList) {
         // create function which return resolved promise
         // with data:base64 string
-        const getBase64 = function(file) {
+        function getBase64(file) {
             const reader = new FileReader();
             return new Promise(resolve => {
                 reader.onload = ev => {
@@ -277,7 +299,7 @@ const fileUtil = (() => {
         file1.txt\t12345\nfile1_as_base64_string\n
         but that would complicate the code for not much return on investment
     */
-    const packFiles = function(unpackedFiles) {
+    function packFiles(unpackedFiles) {
         let repackedFiles = [
             [] // file metadata
             ,[] // file data as base64 string
@@ -294,7 +316,7 @@ const fileUtil = (() => {
         return repackedFiles;
     };
 
-    const packSingleFile = function(unpackedFiles,id) {
+    function packSingleFile(unpackedFiles,id) {
         let file = unpackedFiles[id];
         return [
             [[file.name,file.size]],
@@ -302,7 +324,7 @@ const fileUtil = (() => {
         ];
     }
 
-    const unpackFiles = function(packedFiles) {
+    function unpackFiles(packedFiles) {
         let unpackedFiles = [];
 
         for(let i=0;i<packedFiles[0].length;i++) {
@@ -324,7 +346,7 @@ const fileUtil = (() => {
 
     }
 
-    const processDroppedFiles = async (data) => {
+    async function processDroppedFiles(data) {
         
         return new Promise((resolve, reject) => {
             try {
@@ -346,19 +368,20 @@ const fileUtil = (() => {
         
     };     
     
-    return {
-        processDroppedFiles
-        ,packFiles
-        ,unpackFiles
-        ,packSingleFile
-    };
+//     return {
+//         processDroppedFiles
+//         ,packFiles
+//         ,unpackFiles
+//         ,packSingleFile
+//     };
 
-})();
+// })();
 
-const processFileBlobJson = function(fileBlobJson) {            
+function processFileBlobJson(fileBlobJson) {            
 
-    const parseJsonAndUnpack = function(json) {
-        const files = fileUtil.unpackFiles(
+    function parseJsonAndUnpack(json) {
+        //const files = fileUtil.unpackFiles(
+        const files = unpackFiles(
             JSON.parse(json)
         );
         return files;
@@ -384,7 +407,7 @@ const processFileBlobJson = function(fileBlobJson) {
 
 }
 
-const handlePaste = function(ev) {
+function handlePaste(ev) {
 
     pd(ev);
     ev.target.blur();
@@ -400,7 +423,7 @@ const handlePaste = function(ev) {
 
 }
 
-const fixBrokenJson = function(brokenJson) {
+function fixBrokenJson(brokenJson) {
 
     /*
         a complete block of data JSON should look this:
@@ -462,10 +485,11 @@ const fixBrokenJson = function(brokenJson) {
 
 }
 
-const htmlUtil = (() => {
+////////////////////////////////////////////////////////////////////////
+//const htmlUtil = (() => {
 
     /*
-    const exampleDrawTable = function() {
+    function exampleDrawTable() {
         
         const data = {
             headers: ['1', '2', '3'],
@@ -482,11 +506,11 @@ const htmlUtil = (() => {
     */
 
 
-    const drawRows = function(itemsArray) {
+    function drawRows(itemsArray) {
         return itemsArray.map(o=>drawRow(o,false)).join('');
     };
 
-    const drawRow = function(items, isHeader = false) {
+    function drawRow(items, isHeader = false) {
         let tag = (true === isHeader) ? 'th' : 'td';
 
         return [
@@ -496,7 +520,7 @@ const htmlUtil = (() => {
         ].join('');
     }
 
-    const drawTable = function(data) {
+    function drawTable(data) {
         return [
             '<table>',
             ...(data.headers ? drawRow(data.headers,true) : ''),
@@ -505,22 +529,22 @@ const htmlUtil = (() => {
         ].join('');
     };
 
-    const createElement = function(html) {
+    function createElement(html) {
         let template = document.createElement('template');
         template.innerHTML = html.trim();
         let documentFragment = template.content;
         return documentFragment;
     }
 
-    return {
-        drawTable,
-        createElement
-    };
+//     return {
+//         drawTable,
+//         createElement
+//     };
 
-})();
+// })();
 
 
-const sendFile = function(file) {
+function sendFile(file) {
     var a = document.createElement('a');
     a.href = file.data;
     a.download = file.name;
@@ -531,7 +555,7 @@ const sendFile = function(file) {
     a = null;
 }     
 
-const fileLinkOnclickHandler = function(ev) {
+function fileLinkOnclickHandler(ev) {
     // create a dynamic file link and download it
     pd(ev);
     const link = ev.target;
@@ -540,29 +564,79 @@ const fileLinkOnclickHandler = function(ev) {
     sendFile(file);        
 };
 
-const showHide = function(el,tf) {
+function showHide(el,tf) {
     el.style.setProperty('display', tf ? 'block' : 'none');
 }
 
-function testFileLengths(files) {
-    for(let i=0;i<files.length;i++) {
-        let file = files[i];
-        file.isFileLengthError = !testFileLength(file);
+///////////////////////////////////////////////////
+// const validationUtil = (() => {
+
+    // tests to see if the Sender has dropped too many
+    // files and will overflow the Receiver's clipboard buffer
+    function testForSenderClipboardBufferOverflow() {
+        
+        let blobTextLength = appData.s.packedJson.length;
+    
+        let isBufferError = 
+            (0 != settings.sender.clipboardBufferSize) // 0 == unlimited
+            && (blobTextLength > settings.sender.clipboardBufferSize);
+    
+        showHide(ui.fileReceiveError,isBufferError);    
+        
+    };
+    
+    function updateClipboardBufferSize(value) {
+
+        let number = Number(value);
+        let badInput = Number.isNaN(number);
+        
+        if(badInput)
+            settings.sender.clipboardBufferSize = 0;
+        else                
+            settings.sender.clipboardBufferSize = number;
+
+        if(ui.clipboardBufferSize) {
+            ui.clipboardBufferSize.nextElementSibling
+                .classList.toggle('invalid',badInput);
+
+            testForSenderClipboardBufferOverflow();
+        }
+        
     }
-}
-const testFileLength = function(file) {
-    if(!file.data)
-        return false;
+        
+    function testFileLengths(files) {
+        for(let i=0;i<files.length;i++) {
+            let file = files[i];
+            file.isFileLengthError = !testFileLength(file);
+        }
+    }
+    function testFileLength(file) {
+        if(!file.data)
+            return false;
 
-    // https://stackoverflow.com/a/32140193/740639
-    let expectedLength = ((4 * file.size / 3) + 3) & ~3;
-    let base64Length = (file.data.split(',').at(-1) || '').length;
+        // https://stackoverflow.com/a/32140193/740639
+        let expectedLength = ((4 * file.size / 3) + 3) & ~3;
+        let base64Length = (file.data.split(',').at(-1) || '').length;
 
-    // return false when mismatched lengths
-    return (expectedLength === base64Length);
-}
+        // return false when mismatched lengths
+        return (expectedLength === base64Length);
+    }
 
-const drawReceiveFileTable = function(files) {
+//     return {
+//         clipboardBufferSize,
+//         testForSenderClipboardBufferOverflow,
+//         testFileLengths
+//     };
+
+// })();
+///////////////////////////////////////////////////
+
+function deleteFileFromSendQueue(unpackedFiles, id) {
+    unpackedFiles.splice(id,1);
+    afterFileProcessed(unpackedFiles);
+};
+
+function drawReceiveFileTable(files) {
 
     ui.saveAllFiles.disabled = true;
     ui.clearFiles.disabled = true;
@@ -611,8 +685,10 @@ const drawReceiveFileTable = function(files) {
         data.rows.push(row);
     });
 
-    let tableHtml = htmlUtil.drawTable(data);
-    let tableElement = htmlUtil.createElement(tableHtml);
+    // let tableHtml = htmlUtil.drawTable(data);
+    // let tableElement = htmlUtil.createElement(tableHtml);
+    let tableHtml = drawTable(data);
+    let tableElement = createElement(tableHtml);
       
     container.appendChild(tableElement);
 
@@ -625,14 +701,16 @@ const drawReceiveFileTable = function(files) {
 
 };
 
-const deleteFileFromSendQueue = function(unpackedFiles, id) {
-    unpackedFiles.splice(id,1);
-    afterFileProcessed(unpackedFiles);
-};
+// interesting note: the js minifier that I used renamed a global scope variable
+// to b, which was originally the name of rb(), and it caused the error:
+// "ReferenceError: can't access lexical declaration 'b' before initialization"
+function renderButton (className,value,text) { 
+    return `<button type="button" class="${className}" value="${value}">${text}</button>`.replaceAll('&','&#x1f4cb; Copy '); 
+}
 
-const drawSendFileTable = function(unpackedFiles) {
+function drawSendFileTable(unpackedFiles) {
 
-    copyAllButton.disabled = true;
+    ui.copyAllButton.disabled = true;
     let container = ui.fileSendQueue.querySelector('div');
     while(container.firstChild) 
         container.firstChild.remove();
@@ -702,28 +780,28 @@ const drawSendFileTable = function(unpackedFiles) {
 
         /// I did not compare their minified outputs
     
-    */           
-
-        let b = (c,i,t) => `<button type="button" class="${c}" value="${i}">${t}</button>`.replaceAll('&','&#x1f4cb; Copy ');
+    */
     
         data.rows = unpackedFiles.map((o,i)=>[
                 o.name,
                 o.size,
-                b('remove',i,'Remove'),
-                b('copySingle',i,'& Single File'),
-                ...(sp ? [b('copyJs',i,'& Pasteable')] : '')
+                renderButton('remove',i,'Remove'),
+                renderButton('copySingle',i,'& Single File'),
+                ...(sp ? [renderButton('copyJs',i,'& Pasteable')] : '')
             ]
         );
 
-    let tableHtml = htmlUtil.drawTable(data);
-    let tableElement = htmlUtil.createElement(tableHtml);
-    
+    // let tableHtml = htmlUtil.drawTable(data);
+    // let tableElement = htmlUtil.createElement(tableHtml);
+    let tableHtml = drawTable(data);
+    let tableElement = createElement(tableHtml);
+        
     container.appendChild(tableElement);
-    copyAllButton.disabled = false;
+    ui.copyAllButton.disabled = false;
 
 };
 
-const makeJsPaste = function(id) {
+function makeJsPaste(id) {
     
     let file = appData.s.unpackedFiles[id];
 
@@ -740,43 +818,30 @@ const makeJsPaste = function(id) {
     
 }
 
-const clickAllFileLinks = function() {
+function clickAllFileLinks() {
     ui.fileReceiveQueue
         .querySelectorAll('a')
         .forEach(o=>o.click());        
 }
 
-const copyToClipboard = function(text) {
+function copyToClipboard(text) {
     navigator.clipboard.writeText(text);
 }
 
-
-// tests to see if the Sender has dropped too many
-// files and will overflow the Receiver's clipboard buffer
-const testForSenderClipboardBufferOverflow = function() {
-    
-    let blobTextLength = appData.s.packedJson.length;
-
-    let isBufferError = 
-        (0 != settings.sender.clipboardBufferSize) // 0 == unlimited
-        && (blobTextLength > settings.sender.clipboardBufferSize);
-
-    showHide(ui.fileReceiveError,isBufferError);    
-    
-};
-
-const afterFileProcessed = (unpackedFiles) => {
+function afterFileProcessed(unpackedFiles) {
     appData.s.unpackedFiles = unpackedFiles;
-    let packedFiles = fileUtil.packFiles(unpackedFiles);    
+    //let packedFiles = fileUtil.packFiles(unpackedFiles);    
+    let packedFiles = packFiles(unpackedFiles);    
     appData.s.packedJson = JSON.stringify(packedFiles);
     drawSendFileTable(unpackedFiles);
-    testForSenderClipboardBufferOverflow();      
+    testForSenderClipboardBufferOverflow();
 };
 
-const onNewFiles = function(fileItems) {
+async function onNewFiles(fileItems) {
     toggleDropZone(true);
 
-    return fileUtil.processDroppedFiles(
+    //return fileUtil.processDroppedFiles(
+    return processDroppedFiles(
         fileItems)
     .then((files) => {
         afterFileProcessed(files);
@@ -786,7 +851,7 @@ const onNewFiles = function(fileItems) {
 
 };
 
-const toggleDropZone = function(isWaiting) {
+function toggleDropZone(isWaiting) {
     let cl = ui.dropZone.classList;
     if(isWaiting) {
         cl.remove('drag-enter','ready');
@@ -797,7 +862,7 @@ const toggleDropZone = function(isWaiting) {
     }
 }
 
-const handleFileDrop = function(ev) {
+function handleFileDrop(ev) {
 
     pd(ev);
     if(!ev.dataTransfer.files.length) {
@@ -809,18 +874,18 @@ const handleFileDrop = function(ev) {
 
 }
 
-const clearError  = function(message) {
+function clearError() {
     let el = ui.errorMessage;
     el.querySelector('div').innerText = '';
     el.classList.remove('visible');
 }
-const showError = function(message) {
+function showError(message) {
     ui.errorMessage.querySelector('div').innerHTML += `<p>${message}</p>` ;
     ui.errorMessage.classList.add('visible');
 }
 
-document.onreadystatechange = () => {
+document.addEventListener("readystatechange", () => {
     if (document.readyState === 'complete') {
         init();
     }
-};
+});

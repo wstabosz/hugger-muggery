@@ -1,6 +1,6 @@
 TODO:
 
-* async code when working with big files because the UI locks up and it triggers the web browser "wait/cancel" prompt
+#clipboardBufferOverflowError : change css to classname instead of id
 
 * write detailed usage instructions
 
@@ -33,6 +33,8 @@ DONE:
         to z-order-top Windows Explorer.
 
 * Paste to deploy - Write JS snippet that the user can paste into a web browser JS console which will render this app onto a blank browser Window.  For usage when Internet access is disable on the remote host. 
+
+* async code when working with big files because the UI locks up and it triggers the web browser "wait/cancel" prompt
 
 
 REJECTED:
