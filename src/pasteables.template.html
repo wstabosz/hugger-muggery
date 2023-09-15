@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+
+    <title>&#x1F47A; &#x1f4be; Huggermuggery Pasteables</title>
+
+    <style>
+        em {
+            text-decoration: underline;
+            font-style: normal;
+            font-weight: bold;
+        }
+        textarea {
+            width: 100%;
+            display: block;
+            box-sizing: border-box;
+            min-height: 10rem;
+            height: 80%;
+        }
+        div {
+            border: 1px solid gray;
+            padding: 0 0.5rem;
+            margin: 1rem;
+            background-color: rgb(255, 254, 211);
+            height: 50%;
+        }
+        div > div {
+            margin: 0 0 1rem 0;
+            background-color: #fff;
+        }        
+        #warning {
+            background-color: #faa;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background-color: #ccc;
+        }
+        body > div {
+            width: 50vw;
+        }
+        button {
+            font-size: 1rem;
+            margin: 0 0 0.5rem 0;
+            box-shadow: none;
+            transition: box-shadow .2s linear;
+            padding: 0.25rem;
+            cursor: pointer;
+        }
+        .glow {
+            box-shadow: 0 0 5px 7px red;
+            transition: box-shadow .2s linear;
+        }
+        h2,h3 {
+            margin: 0.5rem 0rem;
+        }
+        /* p {
+            margin: 0;
+        } */
+        kbd  {
+            background-color: #eee;
+            border-radius: 3px;
+            border: 1px solid #b4b4b4;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 2px 0 0 rgba(255, 255, 255, 0.7) inset;
+            color: #333;
+            display: inline-block;
+            font-size: 1em;
+            font-weight: 700;
+            line-height: 1;
+            padding: 2px 4px;
+            white-space: nowrap;
+        }
+
+    </style>
+
+
+    <script>
+
+        const base64 = {
+            launch: '%launch%',
+            download: '%download%'
+        };
+
+        function main() {
+
+            const ui = Array.from(document.querySelectorAll('[id]'))
+                .reduce((acc,cur) => ({ ...acc, [cur.id]: cur}), {});
+
+            document.addEventListener('click' , function(e) {
+                let key = e.target.id;
+                if(!Object.keys(base64).includes(key))
+                    return;
+
+                //console.log(e.target.id);
+                navigator.clipboard.writeText(base64[key]);
+                glow(e.target);
+            } );
+
+        }
+
+        function glow(elm) {
+            elm.classList.add('glow');
+            setTimeout(() => {
+                elm.classList.remove('glow');
+            }, 300);
+        }
+
+        document.addEventListener('readystatechange', () => {
+            if (document.readyState === 'complete') {
+                main();
+            }
+        });
+
+    </script>
+</head>
+
+<body>
+
+    <div>
+        <h2>About</h2>
+        <p>On this page you can find resources for running Huggermuggery on a remote desktop
+            where the online version is inaccessible.</p>
+    
+        <h3>Prerequisites</h3>
+
+        <p>The following items are required:</p>
+        <ol>
+            <li>The remote desktop must have a modern web browser installed.</li>
+            <li>The remote desktop's text clipboard <em>must not</em> be disabled by admin policy.</li>
+        </ol>
+
+       
+    </div>
+
+    <div>
+        <h2>Pasteables</h2>
+
+        <p>Pasteables are small JavaScript programs designed to be copy-and-pasted into a web browser's developer console and then executed.</p>
+
+        <h3>Instructions</h3>
+
+        <ol>
+            <li>On the remote desktop, open a browser tab to <a href="about:blank">about:blank</a></li>
+            <li>In the remote browser, press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> to open the Web Developer Tools, and switch to the <b>Console</b> tab.</li>
+            <li>Copy one of the following pasteables, paste it into the console, and then press enter to execute the code.</li>
+        </ol>
+
+        <div>
+            <h3>Paste to Launch Huggermuggery</h3>
+            <p>This code will launch Huggermuggery directly in the browser window.</p>
+            <button id="launch">&#x1f4cb; Copy to Clipboard</button>
+        </div>
+
+        <div>
+            <h3>Paste to Download Huggermuggery</h3>
+            <p>
+                If you have write access to a persistent file system on the remote desktop,
+                then you can use this code to obtain Huggermuggery as a single html file.
+            </p>
+            <p>
+                The code will write a web page to the browser window containing a link
+                to download the portable Huggermuggery html file.
+            </p>
+            <button id="download">&#x1f4cb; Copy to Clipboard</button>
+        </div>
+
+        <div id="warning">
+            <h3>Warning</h3>
+            <p>
+                Executing arbitrary code in your browser's JavaScript console
+                can put you at risk of a <a href="https://en.wikipedia.org/wiki/Self-XSS">Self-XSS attack</a>.
+            </p>
+            <p>
+                Never run code that you do not trust. Running code inside
+                an about:blank tab should reduce the risk of Self-XSS, but it's not a panacea. 
+            </p>
+            <p>
+                If you don't trust my obfuscated pasteable code on this page, you may download the original <a href="https://github.com/wstabosz/hugger-muggery">source code</a>
+                to audit it for yourself. It includes a build script that will generate these pasteables.
+            </p>
+        </div>
+
+    </div>
+
+    <div>
+        <h2>Huggermuggery Portable</h2>
+
+        <p>You can also download a standalone portable version of <a href="packed.min.html" download="app.html">Huggermuggery</a> to keep on your local PC and/or to the remote desktop.</p>
+    </div>
+
+    
+
+</body>
+
+</html>

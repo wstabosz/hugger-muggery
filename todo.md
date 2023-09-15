@@ -1,5 +1,7 @@
 TODO:
 
+* clean up embedded css 
+
 #clipboardBufferOverflowError : change css to classname instead of id
 
 * write detailed usage instructions
@@ -45,3 +47,8 @@ https://github.com/mpgn/ropycat - similar idea to mine, but uses keyboard simula
 
 https://www.npmjs.com/package/@fidian/rumkin-compression
 - add this to build.js to compress consoleDownloader.js by 60%
+
+
+some interesting security reads about attacks that use base64 encoded files hidden in html emails
+https://thedfirreport.com/2023/08/28/html-smuggling-leads-to-domain-wide-ransomware/
+https://attack.mitre.org/techniques/T1027/006/

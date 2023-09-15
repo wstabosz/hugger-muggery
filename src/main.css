@@ -199,6 +199,10 @@ td, th {
 textarea {
     display: block;
 }
+#clipboardSource{
+    position: fixed;
+    top:-10000px;
+}
 /*cut*/
 .bg-green {
     background-color: rgb(169, 218, 169);

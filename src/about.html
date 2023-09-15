@@ -1,129 +1,182 @@
-<div class="bg-green b1-gray mt1 p1">    
-    <h2>About</h2>
-    <div class="box">
-        <p>
-            Huggermuggery is a browser app for clandestine file transfers.
-            It solves a very specific problem. It was build to bypass admin 
-            policies that disable copy-pasting files between remote desktops.
-            It works by stuffing files into the text clipboard. If you can 
-            copy-paste text, then you can transfer files.
-        </p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
         
-        <h2>Instructions</h2>
-        <p>
-            <ol>
-                <li>On each host, open a browser window to Huggermuggery.</li>
-                <li>On the Sender tab
-                    <ol type="a">
-                        <li>Drop-and-drop the files you wish to transfer.</li>
-                        <li>The File Send Queue should be populated with a list of your files.</li>
-                        <li>Click the <b>[Copy to Clipboard]</b> button.</li>
-                    </ol>
-                </li>
-                <li>On the Receiver tab (on the other host)
-                    <ol type="a">
-                        <li>Paste the contents of your text clipboard into the green textbox.</li>
-                        <li>Once you paste, you should see a list of Received Files.</li>
-                        <li>
-                            To save the files, click the <b>[Save all Files]</b> button.<br>
-                            Or you can click the hyperlinks to save individual files.
-                        </li>
-                    </ol>
-                </li>
-            </ol>
-        </p>
+    <title>&#x1F47A;&#x2753; About Huggermuggery</title>
         
-        <h2>Requirements</h2>
-        
-        <p>
-            You need to use a modern browser. Huggermuggery was tested in Firefox, Chrome, and Edge.
-            It does not work in IE11, which is a shame because on some servers that's all you get.
-        </p>
-        
-        <h2>Troubleshooting</h2>
-        
-        <p>
-            I wrote Huggermuggery for people with a technical skill set. As such, the solutions offered
-            here are written with minimal explanation. They're more like hints than full solutions.
-        </p>
-        
-        <h4>The Receiver only downloads the first file, then stops.</h4>
-        <p>
-        This happens in both Chrome and Firefox (maybe Edge too). It's a safety protocol to prevent a website from flooding your computer with files.
-        You have to configure your browser to allow the site to download multiple files. Look for a setting called "Automatic downloads"
-        Sometimes the browser will prompt you about the automatic download, look for a red warning icon in the address bar.
-        </p>
-        
-        <h4>I don't have Internet access on the remote host.</h4>
-        <p>
-            I anticipated this, so I have few workarounds. They still require access to a modern web browser on the remote host.
-            <ul>
-                <li>If have a way to transfer files to the remote host, download Huggermuggery-portable, and copy to the host.</li>
-            </ul>
-            <ul>
-                <li>If you have access to a modern browser on the host, open <code>about:blank</code>, and copy-paste 
-                    <a href="pasteToSave.js.txt">this code</a> into the JS console. The code writes a copy of Huggermuggery-portable to 
-                    the browser window, which you can then save locally.
-                </li>
-            </ul>
-        </p>
-        
-        <h2>What inspired me to create this?</h2>
-        <p>
-            I am a creative problem solver. I am constantly trying to find better solutions to problems.
-        </p>
-        <p>        
-            I had a problem in which I was working with a remote host where a blanket admin policy had disabled 
-            file transfers through the OS clipboard. The only method available for transferring files was by
-            a cumbersome and slow web portal.
-        </p>
-        <p>
-            I was debugging some code, which required repeated redeployment of the code to the server.
-            For the sake of productivity, I needed a faster way to get the code onto the server.       
-            Luckily, the text clipboard was not disabled, and I was familiar with base64 encoding. I had a workaround.
-            After getting permission from the admins (who were unwilling to enable the file clipboard, but were ok 
-            with my workaround), I wrote a quick-and-dirty WinForms app that would let me transfer the files through
-            the text clipboard.
-        </p>
-        <h4>I wrote this browser version for a couple of reasons:</h4>
-        <p>
-            <b></b>
-            <ul>        
-                <li>For the fun of it.</li>
-                <li>As a portfolio piece.</li>
-                <li>Security holes interesting topic.</li>
-                <li>To share the tool with others.</li>
-            </ul>
-        </p>
-        
-        <h2>An apology to security admins</h2>
-        <p>
-            I suspect that some security admins have read the above with a cringe. If file transfer auditing
-            is a part of your job, I acknowledge that by publishing Huggermuggery, I've made your job a bit more difficult. 
-            I hope that your response will not be to disable the text clipboard on remote desktop sessions, 
-            but rather to monitor it for suspicious activity. Disabling the text clipboard will kill user productivity.
-            Also there are still <a href="https://github.com/mpgn/ropycat">workarounds</a> for a disabled text clipboard.
-        </p>
-        
-        <h2>Other stuff</h2>
-        <p>
-            <a href="http://www.drboring.com/blog/huggermuggery" target="_blank" rel="noopener">
-                Post Development Thoughts
-            </a>
-        </p>
-        
-        <p>
-            <a href="https://github.com/wstabosz/huggermuggery" target="_blank" rel="noopener">
-                Source code
-            </a>
-        </p>
-        
-        <p>Made with&nbsp;<span class="sarcasm" title="Not really made with contempt. Just a play on the 'made with love' trend.">contempt</span>&nbsp;by <a href="https://drboring.com/me">Walter Stabosz</a>
-        </p>
-        
-        <p>
-            Please use responsibly. Huggermuggery will not hide your actions from file system monitoring software.
-            If you read/write files, the OS will trigger the corresponding file system events.
-        </p>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ccc;
+
+        }
+        body > div {
+            width: 50vw;
+        }
+        .mt1 {
+            margin-top: 1em;
+        }
+        .p1 {
+            padding: 1em;
+        }
+        .box {
+            margin: 1em 0 ;
+            padding: 1em;
+            border: 1px solid gray;
+            background-color: #fff;
+        }
+        .bg-green {
+            background-color: rgb(169, 218, 169);
+        }
+        .b1-gray {
+            border: 1px solid gray;
+        }
+        h2 {
+            margin: 0;
+            margin-bottom: 0.5em;
+        }
+        kbd  {
+            background-color: #eee;
+            border-radius: 3px;
+            border: 1px solid #b4b4b4;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 2px 0 0 rgba(255, 255, 255, 0.7) inset;
+            color: #333;
+            display: inline-block;
+            font-size: 1em;
+            font-weight: 700;
+            line-height: 1;
+            padding: 2px 4px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-green b1-gray mt1 p1">    
+        <h2>About</h2>
+        <div class="box">
+            <p>
+                Huggermuggery is a browser app for clandestine file transfers.
+                It solves a very specific problem. It was build to bypass admin 
+                policies that disable copy-pasting files between remote desktops (Citrix, RDP, VNC, etc).
+                It works by stuffing files into the text clipboard. If you can 
+                copy-paste text between desktops, then Huggermuggery will let 
+                you transfer files.
+            </p>
+            
+            <h2>Instructions</h2>
+            <p>
+                <ol>
+                    <li>On each host, open a browser window to Huggermuggery.</li>
+                    <li>To send files
+                        <ol type="a">
+                            <li>Drop-and-drop (or browse for) the files you wish to transfer.</li>
+                            <li>The File Send Queue should be populated with a list of your files.</li>
+                            <li>Click the <kbd>Copy all to Clipboard</kbd> button.<br/>
+                                Or click <kbd>Copy Single File</kbd>
+                            </li>
+                        </ol>
+                    </li>
+                    <li>On the Receiver tab (on the other host)
+                        <ol type="a">
+                            <li>Paste the contents of your text clipboard into the green textbox.</li>
+                            <li>Once you paste, you should see a list of Received Files.</li>
+                            <li>
+                                To save the files, click the <kbd>Save all Files</kbd> button.<br>
+                                Note: If your browser only downloads the first file, check the <em>Troubleshooting</em> section below.<br>
+                                You can also save individual files by clicking the hyperlinks.<br>
+                                
+                            </li>
+                        </ol>
+                    </li>
+                </ol>
+            </p>
+            
+            <h2>Requirements</h2>
+            
+            <p>
+                You need to use a modern browser. Huggermuggery was tested in Firefox, Chrome, and Edge.
+                It does not work in IE11, which is a shame because on some servers that's all you get.
+            </p>
+            
+            <h2>Troubleshooting</h2>
+            
+            <p>
+                I wrote Huggermuggery for people with a technical skill set. As such, the solutions offered
+                here are written with minimal explanation. They're more like hints than full solutions.
+            </p>
+            
+            <h4>The Receiver only downloads the first file, then stops.</h4>
+            <p>
+            This happens in both Chrome and Firefox (maybe Edge too). It's a safety protocol to prevent a website from flooding your computer with files.
+            You have to configure your browser to allow the site to download multiple files. Look for a setting called "Automatic downloads"
+            Sometimes the browser will prompt you about the automatic download, look for a red warning icon in the address bar.
+            <br/>
+            This page has instructions for <a href="https://commongoalsystems.zendesk.com/hc/en-us/articles/9197509173005-How-do-I-enable-automatic-downloads">how to enable automatic downloads</a> on various browsers.
+            </p>
+            
+            <h4>I don't have Internet access on the remote host.</h4>
+            <p>
+                I anticipated this, so I have few workarounds. They still require access to a modern web browser on the remote host.
+                <ul>
+                    <li>If have a way to transfer files to the remote host, download Huggermuggery-portable, and copy to the host.</li>
+                </ul>
+                <ul>
+                    <li>If you have access to a modern browser on the host, open <code>about:blank</code>, and copy-paste 
+                        <a href="pasteToSave.js.txt">this code</a> into the JS console. The code writes a copy of Huggermuggery-portable to 
+                        the browser window, which you can then save locally.
+                    </li>
+                </ul>
+            </p>
+            
+            <h2>What inspired me to create this?</h2>
+            <p>
+                As a creative problem solver, . I am constantly trying to find better solutions to problems.
+            </p>
+            <p>
+                I had a problem in which I was working with a remote host where a blanket admin policy had disabled 
+                file transfers through the OS clipboard. The only method available for transferring files was by
+                a cumbersome and slow web portal.
+            </p>
+            <p>
+                I was debugging some code, which required repeated redeployment of the code to the server.
+                For the sake of productivity, I needed a faster way to get the code onto the server.       
+                Luckily, the text clipboard was not disabled, and I was familiar with base64 encoding. I had a workaround.
+                After getting permission from the admins (who were unwilling to enable the file clipboard, but were ok 
+                with my workaround), I wrote a quick-and-dirty WinForms app that would let me transfer the files through
+                the text clipboard.
+            </p>
+            <h4>I wrote this browser version for a couple of reasons:</h4>
+            <p>
+                <b></b>
+                <ul>        
+                    <li>For the fun of it.</li>
+                    <li>As a portfolio piece.</li>
+                    <li>Security holes interesting topic.</li>
+                    <li>To share the tool with others.</li>
+                </ul>
+            </p>                     
+            
+            <h2>Other stuff</h2>
+            <p>
+                <a href="http://www.drboring.com/blog/huggermuggery" target="_blank" rel="noopener">
+                    Post Development Thoughts
+                </a>
+            </p>                       
+            
+            <p>
+                Please use responsibly. Huggermuggery will not hide your actions from file system monitoring software.
+                If you read/write files, the OS will trigger the corresponding file system events.
+            </p>
+        </div>
     </div>
-</div>
+
+        
+</body>
+
+</html>

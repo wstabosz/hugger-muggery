@@ -661,7 +661,7 @@ function drawReceiveFileTable(files) {
     );
 
     let data = {
-        headers: ['File', 'Size', 'Status'],
+        headers: ['File', 'Size', 'Status', 'Single File'],
         rows: []
     }
     
@@ -825,8 +825,35 @@ function clickAllFileLinks() {
 }
 
 function copyToClipboard(text) {
+    if (!navigator || !navigator.clipboard || !navigator.clipboard.writeText) {
+        copyToClipboard = clipboardFallback;
+        clipboardFallback(text);
+        return;
+    }
     navigator.clipboard.writeText(text);
 }
+
+function clipboardFallback(text) {
+    let el = document.getElementById('clipboardSource');
+
+    if(!el) {
+        el = document.createElement('textarea');
+        el.id = 'clipboardSource';
+        document.body.appendChild(el);
+    }
+    
+    el.value = text;
+    el.focus();
+    el.select();
+    try {
+        document.execCommand('copy');
+    } catch (err) {
+        // can't copy
+        console.log('cannot copy to clipboard');
+    }
+    el.value = '';
+}
+
 
 function afterFileProcessed(unpackedFiles) {
     appData.s.unpackedFiles = unpackedFiles;

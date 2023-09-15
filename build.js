@@ -101,7 +101,7 @@ const injectCss = function(html, css) {
  */
 const injectJs = function(html, js) {    
     return html.replace(
-        '<script lang=Javascript src=main.js async></script>',
+        '<script src=main.js async></script>',
         `<script>${js}</script>`
     );
 }
@@ -155,6 +155,16 @@ document.body.appendChild(a);})();
 
 }
 
+const createPasteables = function(paths, downloader, launcher) {
+
+    let template = fs.readFileSync(paths.in.pasteables, { encoding: 'utf8' });
+
+    template = template.replace(`'%launch%'`, `atob('${toBase64(launcher)}')`);
+    template = template.replace(`'%download%'`,`atob('${toBase64(downloader)}')`);
+
+    return template;
+}
+
 const readFiles = function(paths) {
     return {
         html: fs.readFileSync(paths.in.html, { encoding: 'utf8' })
@@ -200,14 +210,15 @@ const main = async function() {
         in: {
             html: `./src/main.html`,
             css: `./src/main.css`,
-            js: `./src/main.js`
+            js: `./src/main.js`,
+            pasteables: `./src/pasteables.template.html`
         },
         out: {
             packed: `./build/packed.html`,
             packedMin: `./build/packed.min.html`,
             consoleDownloader: `./build/consoleDownloader.js`,
-            saferDownloader: `./build/safeDownloaded.html`,
             consoleLauncher: `./build/consoleLauncher.js`,
+            pasteables: `./build/pasteables.html`
         },
         temp: {
             html: `./build/cut.html`,
@@ -238,10 +249,6 @@ const main = async function() {
 
     fs.writeFileSync(paths.out.packedMin, miniPieces.packedHtmlCssJs, { encoding: 'utf8' });     
     
-    //let saferDownloader = createSaferConsoleDownloader(miniPackedHtml);
-    //fs.writeFileSync(paths.out.saferDownloader, saferDownloader,{ encoding: 'utf8' }); 
-
-    //let base64 = toBase64(miniPieces.packed);
     let downloader = createConsoleDownloader(miniPieces.packedHtmlCssJs);
     fs.writeFileSync(paths.out.consoleDownloader, downloader,{ encoding: 'utf8' }); 
 
@@ -249,17 +256,13 @@ const main = async function() {
     let launcher = createConsoleLauncher(miniPieces, pieces);
     fs.writeFileSync(paths.out.consoleLauncher, launcher,{ encoding: 'utf8' }); 
 
-    
+    let pasteables = createPasteables(paths, downloader, launcher);
+    fs.writeFileSync(paths.out.pasteables, pasteables,{ encoding: 'utf8' }); 
+
     // delete temp files
     fs.unlinkSync(paths.temp.html);
     fs.unlinkSync(paths.temp.css);
 
-    // writeOutputFiles(paths, {
-    //     packedHtml,
-    //     miniPackedHtml,
-    //     downloader,
-    //     // launcher
-    // });
 }
 
 main();
